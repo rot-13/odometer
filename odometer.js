@@ -12,7 +12,7 @@ function ScrollingDigit(container, rolloverListener, id, minVelocity, maxVelocit
   this.lastFrameTime = 0;
 
   var digitPrototype = document.createElement("DIV");
-  digitPrototype.classList.add("digit");
+  digitPrototype.classList.add("odometer_digit");
   this.currentDigit = digitPrototype.cloneNode();
   this.nextDigit = digitPrototype.cloneNode();
   this.container.appendChild(this.currentDigit);
@@ -89,7 +89,7 @@ function Odometer(container) {
   this.container = container;
   this.animating = false;
   this.digitSlotPrototype = document.createElement("SPAN");
-  this.digitSlotPrototype.classList.add("digit_slot");
+  this.digitSlotPrototype.classList.add("odometer_digit_slot");
   this.scrollingDigits = [];
   this.initialized = false;
   this.lastTarget = 0;
@@ -114,7 +114,7 @@ Odometer.prototype.init = function(target) {
   for (var i = 0; i <= numDigits; ++i) {
     if (i > 0 && i % 3 == 0) {
       var comma = document.createElement("SPAN");
-      comma.classList.add("comma_slot");
+      comma.classList.add("odometer_comma_slot");
       comma.textContent = ",";
       this.container.insertBefore(comma, this.container.childNodes[0]);
     }
@@ -137,7 +137,7 @@ Odometer.prototype.rollover = function(id, amount) {
   } else {
     if (this.scrollingDigits.length % 3 == 0) {
       var comma = document.createElement("SPAN");
-      comma.classList.add("comma_slot");
+      comma.classList.add("odometer_comma_slot");
       comma.textContent = ",";
       this.container.insertBefore(comma, this.container.childNodes[0]);
     }

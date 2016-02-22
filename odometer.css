@@ -1,0 +1,22 @@
+.odometer {
+  display: inline-block;
+}
+
+.odometer_digit_slot {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.odometer_digit_slot:after {
+  /* This sets the slot height to the font height */
+  content: '0';
+  visibility: hidden;
+  display: inline-block;
+}
+
+.odometer_digit {
+  position: absolute;
+  left: 0;
+}
+
