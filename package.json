@@ -1,0 +1,19 @@
+{
+  "name": "odometer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "odometer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rot-13/odometer.git"
+  },
+  "author": "",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/rot-13/odometer/issues"
+  },
+  "homepage": "https://github.com/rot-13/odometer"
+}
