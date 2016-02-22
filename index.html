@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <style>
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#target {
+    width: 90%;
+}
+
+.dollar {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#odometer {
+  display: inline-block;
+}
+
+.digit_slot {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.digit_slot:after {
+  /* This sets the slot height to the font height */
+  content: '0';
+  visibility: hidden;
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.digit {
+  position: absolute;
+  left: 0;
+}
+
+    </style>
+    <script type="text/javascript" src="odometer.js"></script>
+  </head>
+  <body>
+    <div class="money">
+      <span class="dollar">$</span><div id="odometer"></div>
+    </div>
+
+    <script>
+window.odometer = new Odometer(document.querySelector("#odometer"));
+window.odometer.setTarget(15);
+    </script>
+  </body>
+</html>
