@@ -2,9 +2,9 @@ function ScrollingDigit(container, rolloverListener, id, minVelocity, maxVelocit
   this.container = container;
   this.rolloverListener = rolloverListener;
   this.id = id;
-  this.minVelocity = minVelocity || 1;
-  this.maxVelocity = maxVelocity || 1000000;
-  this.velocityMultiplier = velocityMultiplier || 8;
+  this.minVelocity = minVelocity;
+  this.maxVelocity = maxVelocity;
+  this.velocityMultiplier = velocityMultiplier;
 
   this.target = null;
   this.currentValue = 0;
@@ -85,8 +85,11 @@ ScrollingDigit.prototype.startAnimating = function() {
   }
 };
 
-function Odometer(container) {
+function Odometer(container, minVelocity, maxVelocity, velocityMultiplier) {
   this.container = container;
+  this.minVelocity = minVelocity || 1;
+  this.maxVelocity = maxVelocity || 1000000;
+  this.velocityMultiplier = velocityMultiplier || 8;
   this.animating = false;
   this.digitSlotPrototype = document.createElement("SPAN");
   this.digitSlotPrototype.classList.add("odometer_digit_slot");
@@ -119,7 +122,7 @@ Odometer.prototype.init = function(target) {
       this.container.insertBefore(comma, this.container.childNodes[0]);
     }
     var digitSlot = this.digitSlotPrototype.cloneNode();
-    var scrollingDigit = new ScrollingDigit(digitSlot, this.rollover.bind(this), i);
+    var scrollingDigit = new ScrollingDigit(digitSlot, this.rollover.bind(this), i, this.minVelocity, this.maxVelocity, this.velocityMultiplier);
     this.scrollingDigits.push(scrollingDigit);
     this.container.insertBefore(digitSlot, this.container.childNodes[0]);
   }
@@ -142,7 +145,7 @@ Odometer.prototype.rollover = function(id, amount) {
       this.container.insertBefore(comma, this.container.childNodes[0]);
     }
     var digitSlot = this.digitSlotPrototype.cloneNode();
-    var scrollingDigit = new ScrollingDigit(digitSlot, this.rollover.bind(this), this.scrollingDigits.length);
+    var scrollingDigit = new ScrollingDigit(digitSlot, this.rollover.bind(this), this.scrollingDigits.length, this.minVelocity, this.maxVelocity, this.velocityMultiplier);
     scrollingDigit.setTarget(0);
     scrollingDigit.setTarget(amount);
     this.scrollingDigits.push(scrollingDigit);
