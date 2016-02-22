@@ -149,3 +149,7 @@ Odometer.prototype.rollover = function(id, amount) {
     this.container.insertBefore(digitSlot, this.container.childNodes[0]);
   }
 };
+
+if (typeof module === 'object' && module.exports) {
+  module.exports = Odometer;
+}
