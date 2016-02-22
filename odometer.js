@@ -1,19 +1,22 @@
-function ScrollingDigit(container, rolloverListener, id) {
+function ScrollingDigit(container, rolloverListener, id, minVelocity, maxVelocity, velocityMultiplier) {
+  this.container = container;
   this.rolloverListener = rolloverListener;
   this.id = id;
-  this.container = container;
+  this.minVelocity = minVelocity || 1;
+  this.maxVelocity = maxVelocity || 1000000;
+  this.velocityMultiplier = velocityMultiplier || 8;
+
   this.target = null;
   this.currentValue = 0;
   this.animating = false;
   this.lastFrameTime = 0;
 
-  this.digitPrototype = document.createElement("DIV");
-  this.digitPrototype.classList.add("digit");
-
-  // You can play with these values:
-  this.minVelocity = 1;
-  this.maxVelocity = 1000000;
-  this.velocityMultiplier = 8;
+  var digitPrototype = document.createElement("DIV");
+  digitPrototype.classList.add("digit");
+  this.currentDigit = digitPrototype.cloneNode();
+  this.nextDigit = digitPrototype.cloneNode();
+  this.container.appendChild(this.currentDigit);
+  this.container.appendChild(this.nextDigit);
 }
 
 ScrollingDigit.prototype.setTarget = function(target) {
@@ -53,16 +56,11 @@ ScrollingDigit.prototype.update = function(dt) {
 };
 
 ScrollingDigit.prototype.drawFrame = function() {
-  this.container.innerHTML = "";
   var intValue = Math.floor(this.currentValue);
-  var currentDigit = this.digitPrototype.cloneNode();
-  var nextDigit = this.digitPrototype.cloneNode();
-  currentDigit.textContent = (intValue === 0 ? " " : intValue % 10);
-  nextDigit.textContent = (intValue+1 === 0 ? " " : (intValue + 1) % 10);
-  currentDigit.style.bottom = ((this.currentValue % 1) * 100) + "%";
-  nextDigit.style.bottom = ((this.currentValue % 1) * 100 - 100) + "%";
-  this.container.appendChild(currentDigit);
-  this.container.appendChild(nextDigit);
+  this.currentDigit.textContent = (intValue === 0 ? " " : intValue % 10);
+  this.nextDigit.textContent = (intValue+1 === 0 ? " " : (intValue + 1) % 10);
+  this.currentDigit.style.bottom = ((this.currentValue % 1) * 100) + "%";
+  this.nextDigit.style.bottom = ((this.currentValue % 1) * 100 - 100) + "%";
 };
 
 ScrollingDigit.prototype.doFrame = function() {
@@ -93,37 +91,44 @@ function Odometer(container) {
   this.digitSlotPrototype = document.createElement("SPAN");
   this.digitSlotPrototype.classList.add("digit_slot");
   this.scrollingDigits = [];
-  this.digitSlots = [];
-  this.firstTime = true;
+  this.initialized = false;
+  this.lastTarget = 0;
 }
 
 Odometer.prototype.setTarget = function(target) {
   target = parseInt(target);
 
-  if (this.firstTime) {
-    var numDigits = (target == 0 ? 1 : Math.floor(Math.log(Math.abs(target)) / Math.LN10));
-    for (var i = 0; i <= numDigits; ++i) {
-      if (i > 0 && i % 3 == 0) {
-        var comma = document.createElement("SPAN");
-        comma.classList.add("comma_slot");
-        comma.textContent = ",";
-        this.container.insertBefore(comma, this.container.childNodes[0]);
-      }
-      var digitSlot = this.digitSlotPrototype.cloneNode();
-      this.digitSlots.push(digitSlot);
-      var scrollingDigit = new ScrollingDigit(digitSlot, this.rollover.bind(this), i);
-      this.scrollingDigits.push(scrollingDigit);
-      this.container.insertBefore(digitSlot, this.container.childNodes[0]);
-    }
-
-    for (var i = 0; i < this.scrollingDigits.length; ++i) {
-      this.scrollingDigits[i].setTarget(Math.floor(target/Math.pow(10, i)));
-    }
-
-    this.firstTime = false;
+  if (!this.initialized || this.lastTarget > target) {
+    this.init(target);
   } else {
     this.scrollingDigits[0].setTarget(target);
   }
+  this.lastTarget = target;
+};
+
+Odometer.prototype.init = function(target) {
+  this.container.innerHTML = "";
+  this.scrollingDigits = [];
+
+  var numDigits = (target == 0 ? 1 : Math.floor(Math.log(Math.abs(target)) / Math.LN10));
+  for (var i = 0; i <= numDigits; ++i) {
+    if (i > 0 && i % 3 == 0) {
+      var comma = document.createElement("SPAN");
+      comma.classList.add("comma_slot");
+      comma.textContent = ",";
+      this.container.insertBefore(comma, this.container.childNodes[0]);
+    }
+    var digitSlot = this.digitSlotPrototype.cloneNode();
+    var scrollingDigit = new ScrollingDigit(digitSlot, this.rollover.bind(this), i);
+    this.scrollingDigits.push(scrollingDigit);
+    this.container.insertBefore(digitSlot, this.container.childNodes[0]);
+  }
+
+  for (var i = 0; i < this.scrollingDigits.length; ++i) {
+    this.scrollingDigits[i].setTarget(Math.floor(target/Math.pow(10, i)));
+  }
+
+  this.initialized = true;
 };
 
 Odometer.prototype.rollover = function(id, amount) {
@@ -137,7 +142,6 @@ Odometer.prototype.rollover = function(id, amount) {
       this.container.insertBefore(comma, this.container.childNodes[0]);
     }
     var digitSlot = this.digitSlotPrototype.cloneNode();
-    this.digitSlots.push(digitSlot);
     var scrollingDigit = new ScrollingDigit(digitSlot, this.rollover.bind(this), this.scrollingDigits.length);
     scrollingDigit.setTarget(0);
     scrollingDigit.setTarget(amount);
